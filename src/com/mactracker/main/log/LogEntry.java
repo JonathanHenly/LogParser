@@ -253,10 +253,13 @@ public class LogEntry {
                         // single space after 3rd colon denotes user MAC
                         case SPACE:
                             if (ccnt == COLONS_TILL_USER_MAC) {
+                                // mark beginning colon of station (user) mac
                                 mark = cur;
+                                // read until next colon (end of mac)
                                 while (buf[cur++] != COLON) {}
-                                umac = Arrays.copyOfRange(buf, mark,
-                                    cur - mark - 1);
+                                
+                                umac = Arrays.copyOfRange(buf, mark, cur - 1);
+                                
                                 ccnt += 1;
                             }
                             break;
@@ -314,9 +317,10 @@ public class LogEntry {
                         case SPACE:
                             if (ccnt == COLONS_TILL_USER_MAC) {
                                 mark = cur;
+                                
                                 while (buf[cur++] != COLON) {}
-                                umac = Arrays.copyOfRange(buf, mark,
-                                    cur - mark - 1);
+                                
+                                umac = Arrays.copyOfRange(buf, mark, cur - 1);
                                 ccnt += 1;
                             }
                             break;
@@ -377,8 +381,7 @@ public class LogEntry {
                             if (ccnt == COLONS_TILL_USER_MAC) {
                                 mark = cur;
                                 while (buf[cur++] != COLON) {}
-                                umac = Arrays.copyOfRange(buf, mark,
-                                    cur - mark - 1);
+                                umac = Arrays.copyOfRange(buf, mark, cur - 1);
                                 ccnt += 1;
                             }
                             break;
@@ -463,8 +466,7 @@ public class LogEntry {
                             if (ccnt == COLONS_TILL_USER_MAC) {
                                 mark = cur;
                                 while (buf[cur++] != COLON) {}
-                                umac = Arrays.copyOfRange(buf, mark,
-                                    cur - mark - 1);
+                                umac = Arrays.copyOfRange(buf, mark, cur - 1);
                                 ccnt += 1;
                             }
                             break;
