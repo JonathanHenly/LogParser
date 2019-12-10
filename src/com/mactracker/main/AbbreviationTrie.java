@@ -1,4 +1,4 @@
-package com.mactracker.main;
+package com.mactracker.main.log;
 
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -167,18 +167,24 @@ public class AbbreviationTrie {
         if (size() > MAX_CAPACITY)
             return TRIE_IS_FULL;
         
-        return put(root, key.toCharArray(), 0, value);
+        int index = nextIndex;
+        if (values.contains(value)) {
+            index = values.indexOf(value);
+        }
+        
+        return put(root, key.toCharArray(), 0, value, index);
     }
     
     /* put helper method, checks for duplicate puts and undoes them */
-    private int put(Node node, final char[] key, int cur, String value) {
+    private int put(Node node, final char[] key, int cur, String value,
+        int index) {
         
         if (key[cur] <= ASCII_CTRL_OFFSET || key[cur] == 127) {
             undoCtrlPut(node, key, cur);
             return KEY_HAS_CTRL_CHARS;
         }
         
-        node = node.add(key[cur], nextIndex);
+        node = node.add(key[cur], index);
         
         if (cur == key.length - 1) {
             // if end node is already an abbreviation then we're adding a
@@ -195,15 +201,17 @@ public class AbbreviationTrie {
             // update root's associated values count, which size() returns
             root.avals += 1;
             
-            // add this value to the values list at the right index
-            values.add(value);
-            nextIndex += 1;
+            // add value to the values list if it not already there
+            if (index == nextIndex) {
+                values.add(value);
+                nextIndex += 1;
+            }
             
             return node.valueIndex();
         }
         
         // tail recursion
-        return put(node, key, cur + 1, value);
+        return put(node, key, cur + 1, value, index);
     }
     
     /* rolls back 'put's pertaining to control characters */
