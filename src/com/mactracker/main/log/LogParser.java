@@ -80,8 +80,8 @@ public class LogParser {
     private int nonNotiCount;
     
     // used to debug parsing
-    StringBuilder debugAll = new StringBuilder();
-    StringBuilder debugFocus = new StringBuilder();
+    StringBuilder debugAll;
+    StringBuilder debugFocus;
     
     private void debugEntry(StringBuilder sb, String tag) {
         if (!outputDebug)
@@ -99,74 +99,13 @@ public class LogParser {
     
     /* tells this instance to write debug files after parsing */
     public LogParser outputDebug() {
-        outputDiagnostics = true;
+        debugAll = new StringBuilder();
+        debugFocus = new StringBuilder();
+        
+        outputDebug = true;
         return this;
     }
     
-    /**
-     * 
-     */
-    public List<LogEntry> parse() {
-        List<LogEntry> entries = new LinkedList<LogEntry>();
-        LogEntry entry = null;
-        
-        // diagnostics
-        startTime = System.nanoTime();
-        
-        // fill buffer initially
-        fillBuffer();
-        // continue with parsing if the file is not empty
-        boolean parsing = (charsRead != EOF);
-        while (parsing) {
-            
-            state = PARSE_HEAD | TSTAMP_SECT;
-            entry = parseEntry();
-            
-            if (entry != null) {
-                switch (entry.getType()) {
-                    case SKIP:
-                        skipNotiCount += 1;
-                        break;
-                    
-                    case ASSOC_SUCCESS:
-                        assocSuccessCount += 1;
-                        entries.add(entry);
-                        break;
-                    
-                    case DEAUTH_FROM:
-                        deauthFromCount += 1;
-                        entries.add(entry);
-                        break;
-                    
-                    case DEAUTH_TO:
-                        deauthToCount += 1;
-                        entries.add(entry);
-                        break;
-                }
-                
-            }
-            
-            // diagnostics
-            lineCount += 1;
-            
-            // refill buf only if needed
-            if (charsRead != EOF && cur + SAFE_MAX_ENTRY_LENGTH > end) {
-                refillBuffer();
-            }
-            
-            parsing = (cur < end) || (charsRead != EOF);
-        }
-        
-        // diagnostics
-        if (outputDiagnostics)
-            outputDiagnostics(System.out);
-        
-        // debugging
-        if (outputDebug)
-            writeDebugInfo();
-        
-        return entries;
-    }
     
     /* Outputs diagnostic information. */
     private void outputDiagnostics(PrintStream out) {
@@ -278,9 +217,88 @@ public class LogParser {
         buf = new char[tmplen];
     }
     
-    private Reader getInput() { return in; }
-    
     public int getBufferLength() { return buf.length; }
+    
+    /**
+     * Calls {@link #parse parse()} and closes {@code input} after parsing.
+     */
+    public List<LogEntry> parseAndClose() {
+        List<LogEntry> entries = parse();
+        
+        try {
+            in.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return entries;
+    }
+    
+    /**
+     * 
+     */
+    public List<LogEntry> parse() {
+        List<LogEntry> entries = new LinkedList<LogEntry>();
+        LogEntry entry = null;
+        
+        // diagnostics
+        startTime = System.nanoTime();
+        
+        // fill buffer initially
+        fillBuffer();
+        // continue with parsing if the file is not empty
+        boolean parsing = (charsRead != EOF);
+        while (parsing) {
+            
+            state = PARSE_HEAD | TSTAMP_SECT;
+            entry = parseEntry();
+            
+            if (entry != null) {
+                switch (entry.getType()) {
+                    case SKIP:
+                        skipNotiCount += 1;
+                        break;
+                    
+                    case ASSOC_SUCCESS:
+                        assocSuccessCount += 1;
+                        entries.add(entry);
+                        break;
+                    
+                    case DEAUTH_FROM:
+                        deauthFromCount += 1;
+                        entries.add(entry);
+                        break;
+                    
+                    case DEAUTH_TO:
+                        deauthToCount += 1;
+                        entries.add(entry);
+                        break;
+                }
+                
+            }
+            
+            // diagnostics
+            lineCount += 1;
+            
+            // refill buf only if needed
+            if (charsRead != EOF && cur + SAFE_MAX_ENTRY_LENGTH > end) {
+                refillBuffer();
+            }
+            
+            parsing = (cur < end) || (charsRead != EOF);
+        }
+        
+        // diagnostics
+        if (outputDiagnostics)
+            outputDiagnostics(System.out);
+        
+        // debugging
+        if (outputDebug)
+            writeDebugInfo();
+        
+        return entries;
+    }
+    
     
     /**
      * Parses the head portion of this log entry.
@@ -393,22 +411,22 @@ public class LogParser {
                         // this catches ERRS and system entries
                         
                         // skip ahead to beginning of new entry
-                        while (buf[cur++] != '\n') {}
+                        while (buf[cur++] != ENTRY_DELIM) {}
                         
                         // diagnostics
-                        otherErrorCount = 1;
+                        otherErrorCount += 1;
                         // debug other error string builder for file output
                         debugEntry(debugAll, "ColAfterNoBrackets");
                         
                         start = cur;
                         state = NEW_ENTRY;
+                        
                         return null;
                     }
                     
                     break;
                 
                 case SPACE:
-                    
                     // first space in log entry comes immediately after tstamp
                     if (stateHas(TSTAMP_SECT)) {
                         // update state and mark the end of the timestamp
@@ -430,6 +448,7 @@ public class LogParser {
                     
                     // check for two back-to-back spaces
                     if (buf[cur - 1] == SPACE) {
+                        
                         // two spaces before the 4th colon usually indicates the
                         // log entry is from a controller
                         if (colcnt == NUM_TSTAMP_COLONS) {
@@ -447,6 +466,7 @@ public class LogParser {
                             // continue out of PARSE_HEAD loop
                             continue;
                         }
+                        
                     }
                     
                     break;
@@ -659,20 +679,6 @@ public class LogParser {
         return entry;
     }
     
-    /**
-     * Calls {@link #parse parse()} and closes {@code input} after parsing.
-     */
-    public List<LogEntry> parseAndClose() {
-        List<LogEntry> entries = parse();
-        
-        try {
-            in.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        
-        return entries;
-    }
     
     /* move unread to buffer front and fill in rest */
     private void refillBuffer() {
