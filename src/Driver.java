@@ -15,11 +15,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.List;
 
-import com.mactracker.main.AbbreviationTrie;
-import com.mactracker.main.Analyzer;
-import com.mactracker.main.Utils;
+import com.mactracker.main.log.AbbreviationTrie;
 import com.mactracker.main.log.LogEntry;
 import com.mactracker.main.log.LogParser;
+import com.mactracker.main.log.Utils;
 
 
 public class Driver {
@@ -35,12 +34,7 @@ public class Driver {
         
         LogEntry.setAbbreviationTrie(abbr);
         
-        String filename;
-        
-        // filename = "./zin/wifi_2_gt.txt";
-        filename = "E:\\ITCS-4155\\res\\data\\wifi_1\\wifi_1_bi.txt";
-        // filename = "./zin/wifi_logs-10_10_19-1K.txt");
-        // filename = "./zin/wifi_2_ej-rand-60.txt");
+        String filename = "./zin/wifi_2_gt.txt";
         
         File logs = new File(filename);
         Charset cset = Charset.forName("ASCII");
@@ -64,15 +58,15 @@ public class Driver {
         
         System.out.println();
         System.out.println("-- finished parsing --");
+        
+        System.out.println();
+        System.out.println("-- outputting first 10 entries --");
+        for (int i = 0; i < 10; i++) {
+            System.out.println("Entry " + (i + 1) + ":");
+            System.out.println(entries.get(i));
+        }
+        
         /* End Parser Testing */
-        
-        System.out.println("Number of analyzable entries:  " + entries.size());
-        
-        System.out.println("-- Analyzing log file --");
-        
-        Analyzer analyst = new Analyzer(abbr.getValues(), entries);
-        
-        // analyst.aggregateApTraffic();
         
         
     }

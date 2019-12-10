@@ -4,9 +4,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mactracker.main.AbbreviationTrie;
-import com.mactracker.main.Utils;
-
 
 public class LogEntry {
     private static final int SAFE_BUMP = 0;
@@ -52,11 +49,11 @@ public class LogEntry {
         public int hashCode() {
             int h = hash;
             if (h == 0) {
-                h = (int) Utils.FNVHash(mac, 0);
+                h = Arrays.hashCode(mac);
                 hash = h;
             }
             
-            return hash;
+            return h;
         }
         
         @Override
@@ -67,23 +64,11 @@ public class LogEntry {
                 return false;
             
             Station that = (Station) obj;
-            if (this.mac == null && that.mac == null)
-                return true;
-            if (this.mac == null && that.mac != null)
-                return false;
-            if (this.mac != null && that.mac == null)
-                return false;
-            if (this.mac.length != that.mac.length)
-                return false;
-            
-            for (int i = 0; i < this.mac.length; i++) {
-                if (this.mac[i] != that.mac[i])
-                    return false;
-            }
-            
-            // passed all checks
-            return true;
+            return Arrays.equals(this.mac, that.mac);
         }
+        
+        @Override
+        public String toString() { return String.valueOf(mac); }
     }
     
     /* class members */
@@ -170,6 +155,9 @@ public class LogEntry {
      * @return the building name associated with this AP or the raw AP name
      */
     public String getApName() {
+        if (getApCode() < 0)
+            return "Unknown";
+        
         return apNames.getValueFromIndex(getApCode());
     }
     
@@ -205,8 +193,9 @@ public class LogEntry {
     public String toString() {
         String s = "";
         
-        s = String.format("%d  [ %s ]  '%s'  [%d] %s", tstamp, type.toString(),
-            sta, getApCode(), getApName());
+        s = String.format(
+            "Timestamp:[ %d ]  Type:[ %s ]  Station-MAC:[ %s ]  AP-Code:[ %d ] AP-Name:[ %s ]",
+            tstamp, type.toString(), sta.toString(), getApCode(), getApName());
         
         return s;
     }

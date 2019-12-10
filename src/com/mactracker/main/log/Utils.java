@@ -1,4 +1,4 @@
-package com.mactracker.main;
+package com.mactracker.main.log;
 
 import java.io.BufferedReader;
 import java.io.IOException;

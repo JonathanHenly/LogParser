@@ -1,0 +1,68 @@
+# UNCC building abbreviation mapping file
+# + comments ('#') can either start a line or come after a key-value pair
+# + in the off chance a building abbreviation or name contains a '#', escape it
+#   using '/#' as in 'HaTa = /#-Tag' or '/#Ta = Hash-Tag'
+# + in the off chance a building abbreviation or name contains a '=', escape it
+#   using '/=' as in 'equa = /=s' or '/=s = Equals'
+
+Atki = Atkins
+Auxi = Auxiliary Services Building
+BandCor = Johnson Band Center
+BelGGym = Belk Gym
+BelH = Belk Hall
+Bioi = Bioinformatics
+Biss = Bissell House
+Burs = Burson
+Cato = Cato Hall
+CenC = Center City Building
+CoEd = CoEd Dorms
+Cone = Cone University Center
+Colv = Colvard
+Coun = Price Counseling Center
+Duke = Duke Centennial Hall
+EPIC = EPIC Building
+EHS = Facilities Annex Eight
+Faci = Facilities Annex One
+FaciA = Facilities Annex
+FOPS = Facilities Ops and Parking
+FouA = Foundation Annex
+Foun = UNC Charlotte Foundation
+Fret = Fretwell
+Frid = Friday
+Gage = Gage Undergraduate Admissions Center
+Grig = Grigg Hall
+Heal = Student Health Center
+Hous = Housing and Residence Life
+HunH = Hunt Hall
+Irwi = Irwin Belk Track Complex
+JBui = J Building
+Kenn = Kennedy
+King = King
+Levi = Levine Hall
+Lync = Lynch Hall
+NCRC = NC Research Campus
+NERF = NRFC Fieldhouse
+Nine = Niner House
+Mart = Martin Hall
+McCo = Mc Cooper
+McEn = McEniry
+McMi = McMillan Greenhouse
+Memo = Memorial Hall
+MSII = Motorsports Research
+PORT = PORTAL
+Pros = Prospector
+RE = Recreational Field 13
+Robi = Robinson Hall
+Rowe = Rowe Arts
+RUP1 = Regional Utility Plant 1
+RUP2 = Regional Utility Plant 2
+RUP4 = Regional Utility Plant 4
+Smit = Smith
+Stor = Storrs
+StuA = Student Activity Center
+StuU = Student Union
+SVDH = South Village Crossing
+Temp = Temp AP
+Unio = Union Deck
+Wach = Wachovia Fieldhouse (Wells Fargo Fieldhouse)
+Wood = Woodward Hall
